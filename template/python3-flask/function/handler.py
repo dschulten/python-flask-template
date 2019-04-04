@@ -2,22 +2,27 @@ from PyPDF2 import PdfFileMerger, PdfFileReader
 from flask import send_file
 import tempfile
 
+
 def handle(req):
     """handle a request to the function
     Args:
         req (request): flask request
     """
-    files = req.files
+    files = req.files   # multipart files http://flask.pocoo.org/docs/1.0/patterns/fileuploads/
     file_storages = files.getlist("files")
-    print(file_storages)
 
+    if len(file_storages) == 0:
+        raise ValueError("no files given. Ensure the multipart boundaries match the one in content-type, "
+                         "and the content-disposition of each file part contains both the name 'files' "
+                         "as well as a 'filename' attribute")
+
+    # https://pythonhosted.org/PyPDF2/index.html
     merger = PdfFileMerger()
 
     for file_storage in file_storages:
-        pdfFileReader = PdfFileReader(file_storage)
-        merger.append(pdfFileReader)
+        pdf_file_reader = PdfFileReader(file_storage)
+        merger.append(pdf_file_reader)
 
-    # with open('D:/result.pdf', 'wb') as fout:   # write binary
     fout = tempfile.TemporaryFile()
     merger.write(fout)
 
