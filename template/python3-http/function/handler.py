@@ -12,9 +12,9 @@ def handle(event, context):
     files = event.files  # multipart files http://flask.pocoo.org/docs/1.0/patterns/fileuploads/
 
     if len(files) == 0:
-        return { "body": form.getlist('foo') }
+        return { "body": form.get('foo') }
 
-    original_files = form.getlist("originalFiles")
+    result_file_name = event.form.get('resultFileName')
 
     file_storages = files.getlist("files")
 
@@ -52,8 +52,8 @@ def handle(event, context):
     return {
         'statusCode': 200,
         "headers": {
-            "Content-Disposition": "attachment; filename=result.pdf"
-            # 'Content-Type': 'application/pdf'
+            "Content-Disposition": 'attachment; filename="' + result_file_name + '"',
+            'Content-Type': 'application/pdf'
         },
         'file': fout
     }
